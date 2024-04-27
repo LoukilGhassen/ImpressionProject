@@ -4,91 +4,76 @@ import tn.iia.Impression.model.RoleUser;
 import tn.iia.Impression.model.StatutCompteUser;
 import tn.iia.Impression.model.Utilisateur;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO {
-/*
-    public boolean CreateUser(Utilisateur obj) {
-        boolean test;
+    public void AddUser(Utilisateur user) {
+        String query = "INSERT INTO `utilisateurs` (`nom`, `prenom`, `login`, `password`, `statut`, `role`) VALUES ('"+user.getNom()+"', '"+
+                user.getPrenom()+"', '"+user.getLogin()+"', '"+user.getPassword()+"', '"+user.getStatut()+"', '"+user.getRole()+"')";
         try {
-            PreparedStatement ps = connexion.prepareStatement(
-                    "insert into utilisateur (`nom`, `prenom`,`statut`, `role`,  `login`, `password`) values (?,?,?,?,?,?,?,?)");
-
-            ps.setString(1, obj.getNom());
-            ps.setString(2, obj.getPrenom());
-            ps.setString(7,obj.getRole().toString());
-            ps.setString(8,obj.getPassword());
-            ps.executeUpdate();
-            ps.close();
-            test=true;
-        } catch (SQLException e1) {
-
-            test=false;
+            Statement statement = connexionDB.getConnectionStatement();
+            statement.executeUpdate(query);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return test;
     }
 
-    public Utilisateur getById(int id) {
-        Utilisateur user = new Utilisateur();
+    public Utilisateur findByLoginMp(String login, String password) {
+        String query = "SELECT * FROM utilisateurs  WHERE `login` = '" + login + "' AND `password` = '" + password + "'";
         try {
-            PreparedStatement ps = connexion.prepareStatement("select * from utilisateurs where id=?");
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
+            Statement statement = connexionDB.getConnectionStatement();
+            ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
-                user.setNom(rs.getString(1));
-                user.setPrenom(rs.getString(2));
+                Utilisateur newUser=new Utilisateur();
+                newUser.setId(rs.getInt(1));
+                newUser.setNom(rs.getString(2));
+                newUser.setPrenom(rs.getString(3));
+                newUser.setLogin(rs.getString(4));
+                newUser.setPassword(rs.getString(5));
+                newUser.setStatut(StatutCompteUser.valueOf(rs.getString(6)));
+                newUser.setRole(RoleUser.valueOf(rs.getString(7)));
 
-                user.setRole(RoleUser.valueOf(rs.getString(7)));
-                user.setPassword(rs.getString(8));
+                return newUser;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return user;
+        return null;
     }
 
-    public List<Utilisateur> getAll() {
-        List<Utilisateur> listeUtilisateur = new ArrayList<>();
+    public void UpdateStatus(Utilisateur user,StatutCompteUser statut) {
+        String query = "UPDATE `utilisateurs` SET `statut` = '"+statut.toString()+"' WHERE `utilisateurs`.`id` = "+user.getId()+";";
         try {
-            PreparedStatement ps = connexion.prepareStatement("select * from utilisateurs");
-            ResultSet rs = ps.executeQuery();
+            Statement statement = connexionDB.getConnectionStatement();
+            statement.executeUpdate(query);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Utilisateur> findAll() {
+        List<Utilisateur> list = new ArrayList<>();
+        String query = "SELECT * FROM `utilisateurs`";
+        try {
+            Statement statement = connexionDB.getConnectionStatement();
+            ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
-                Utilisateur user = new Utilisateur();
+               Utilisateur newUser=new Utilisateur();
+               newUser.setId(rs.getInt(1));
+               newUser.setNom(rs.getString(2));
+               newUser.setPrenom(rs.getString(3));
+               newUser.setLogin(rs.getString(4));
+               newUser.setPassword(rs.getString(5));
+                newUser.setStatut(StatutCompteUser.valueOf(rs.getString(6)));
+               newUser.setRole(RoleUser.valueOf(rs.getString(7)));
 
-                user.setNom(rs.getString(1));
-                user.setPrenom(rs.getString(2));
-
-                user.setRole(RoleUser.valueOf(rs.getString(7)));
-
-                listeUtilisateur.add(user);
-
+               list.add(newUser);
             }
-        } catch (SQLException e) {
-            return null;
+            return  list;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return listeUtilisateur;
     }
-
-    public boolean DisableUser(Utilisateur obj) {
-        boolean test;
-        try {
-            PreparedStatement ps = connexion.prepareStatement(
-                    "update utilisateurs set statut="+ StatutCompteUser.Desactiver.toString()+" where id=?");
-            ps.setInt(1, obj.getId());
-
-            ps.executeUpdate();
-            ps.close();
-            test=true;
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-            test=false;
-        }
-        return test;
-    }
-
-*/
 }

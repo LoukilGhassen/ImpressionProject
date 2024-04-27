@@ -9,12 +9,13 @@ public class Utilisateur {
     public Utilisateur() {
     }
 
-    public Utilisateur(String nom, String prenom, String login, String password) {
+    public Utilisateur(String nom, String prenom, String login, String password,RoleUser roleuser) {
         this.nom = nom;
         this.prenom = prenom;
         this.login = login;
         this.password = password;
         this.statut = StatutCompteUser.Desactiver;
+        this.role=roleuser;
     }
 
     public RoleUser getRole() {
