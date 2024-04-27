@@ -19,7 +19,28 @@ public class UserDAO {
             throw new RuntimeException(e);
         }
     }
+    public Utilisateur findById(int id) {
+        String query = "SELECT * FROM utilisateurs  WHERE `id` = " + id ;
+        try {
+            Statement statement = connexionDB.getConnectionStatement();
+            ResultSet rs = statement.executeQuery(query);
+            if (rs.next()) {
+                Utilisateur newUser=new Utilisateur();
+                newUser.setId(rs.getInt(1));
+                newUser.setNom(rs.getString(2));
+                newUser.setPrenom(rs.getString(3));
+                newUser.setLogin(rs.getString(4));
+                newUser.setPassword(rs.getString(5));
+                newUser.setStatut(StatutCompteUser.valueOf(rs.getString(6)));
+                newUser.setRole(RoleUser.valueOf(rs.getString(7)));
 
+                return newUser;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
     public Utilisateur findByLoginMp(String login, String password) {
         String query = "SELECT * FROM utilisateurs  WHERE `login` = '" + login + "' AND `password` = '" + password + "'";
         try {
